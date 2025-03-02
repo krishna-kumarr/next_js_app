@@ -1,7 +1,8 @@
+// page.js or your component with dynamic metadata
 import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "./page.module.css"; 
 
-export default function Home() {
+export default function Home({ metadata }) {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -46,6 +47,7 @@ export default function Home() {
           </a>
         </div>
       </main>
+
       <footer className={styles.footer}>
         <a
           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
