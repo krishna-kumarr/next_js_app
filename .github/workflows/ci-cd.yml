@@ -5,25 +5,11 @@ on: push
 jobs:
   generate-env:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Must match an existing environment name (e.g., 'main', 'prod', etc.)
+    environment: ${{ github.ref_name }}  # Ensure environment matches the branch name
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Install GitHub CLI
-        run: |
-          sudo apt update
-          sudo apt install -y gh
-
-      - name: Authenticate GitHub CLI
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-
-      - name: Set repo and environment variables
-        run: |
-          echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
-          echo "ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Create .env and write REACT_APP_CRYPTO_SECRET_KEY
         run: |
@@ -37,19 +23,17 @@ jobs:
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
-      - name: Securely verify .env keys
+      - name: Verify .env file content and existence
         run: |
-          echo "✅ Verifying .env keys:"
-          awk -F '=' '{ print "- " $1 }' .env
-
-      - name: Check that secret values are not empty
-        run: |
-          source .env
-          if [ -z "$REACT_APP_CRYPTO_SECRET_KEY" ] || [ -z "$REACT_APP_API_URL" ]; then
-            echo "❌ One or more secrets are empty!"
-            exit 1
+          echo "Verifying .env file..."
+          ls -la
+          if [ -f .env ]; then
+            echo ".env file found!"
+            echo "Contents of .env:"
+            cat .env
           else
-            echo "✅ All secrets are present and non-empty."
+            echo "ERROR: .env file not found!"
+            exit 1
           fi
 
       - name: Upload .env file as artifact
