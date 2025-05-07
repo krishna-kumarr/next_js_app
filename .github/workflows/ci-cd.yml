@@ -5,7 +5,7 @@ on: push
 jobs:
   sample-job:
     runs-on: ubuntu-latest
-    environment: main 
+    environment: main
 
     steps:
       - name: Checkout repository
@@ -15,12 +15,22 @@ jobs:
         run: echo "Hello World!"
 
       - name: Write secret to .env
-        run: echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" >> .env
+        run: |
+          echo "Writing secret to .env"
+          echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" >> .env
+          cat .env  # Output the content of .env for debugging purposes
+
         env:
           REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
 
-      - name: View .env file (for testing only)
-        run: cat .env
+      - name: Ensure .env file exists
+        run: |
+          if [ -f .env ]; then
+            echo ".env file found!"
+          else
+            echo ".env file does not exist!"
+            exit 1
+          fi
 
       - name: Upload .env file as artifact
         uses: actions/upload-artifact@v4
