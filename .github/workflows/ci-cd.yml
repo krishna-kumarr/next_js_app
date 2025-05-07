@@ -24,21 +24,3 @@ jobs:
         run: |
           echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
           echo "ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
-
-      - name: List available secrets (names only)
-        run: |
-          echo "Fetching secrets from environment: $ENVIRONMENT"
-          gh api repos/$REPO/environments/$ENVIRONMENT/secrets --jq '.secrets[].name'
-
-      - name: Write hardcoded secrets to .env (example)
-        run: |
-          echo "Creating .env file"
-          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}"
-          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}"
-          cat .env
-
-      - name: Upload .env file
-        uses: actions/upload-artifact@v4
-        with:
-          name: env-file
-          path: .env
