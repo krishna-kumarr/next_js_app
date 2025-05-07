@@ -1,14 +1,29 @@
 name: hello-world
+
 on: push
+
 jobs:
   sample-job:
     runs-on: ubuntu-latest
-    environment: main
+    environment: main 
+
     steps:
-      - name: my-step
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Say Hello
         run: echo "Hello World!"
 
-      - name: Retrieve API_KEY secret
-        run: echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" >> .env
+      - name: Write secret to .env
+        run: echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" >> .env
         env:
           REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
+
+      - name: View .env file (for testing only)
+        run: cat .env
+
+      - name: Upload .env file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: env-file
+          path: .env
