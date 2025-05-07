@@ -24,3 +24,8 @@ jobs:
         run: |
           echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
           echo "ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: List available secrets (names only)
+        run: |
+          echo "Fetching secrets from environment: $ENVIRONMENT"
+          gh api repos/$REPO/environments/$ENVIRONMENT/secrets --jq '.secrets[].name'
