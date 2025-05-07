@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "env:pull": "bash scripts/sync-env.sh",
+    "env:push": "bash scripts/push-env.sh",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
