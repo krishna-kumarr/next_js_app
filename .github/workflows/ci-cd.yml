@@ -19,32 +19,5 @@ jobs:
           echo "Writing secrets for branch: $GITHUB_REF"
           
           # Overwrite .env file with branch-specific secrets
-          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" > .env
+          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" >> .env
           echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
-          
-          # Debug: Show the content of .env file to verify it was written
-          cat .env
-          
-        env:
-          REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-
-      - name: Check if .env file exists
-        run: |
-          # List the current directory contents to verify that .env exists
-          ls -la
-          
-          # Check if the .env file exists
-          if [ -f .env ]; then
-            echo ".env file found!"
-            cat .env  # Print content for debugging
-          else
-            echo ".env file does not exist!"
-            exit 1
-          fi
-
-      - name: Upload .env file as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: env-file
-          path: .env
