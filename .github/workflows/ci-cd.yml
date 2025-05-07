@@ -1,24 +1,44 @@
-name: hello-world
+name: Generate .env from Environment Secrets
 
 on: push
 
 jobs:
-  sample-job:
+  generate-env:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Dynamically set the environment based on the branch name
+    environment: ${{ github.ref_name }}  # Must match an environment name in GitHub
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Say Hello
-        run: echo "Hello World!"
-
-      - name: Dynamically Set Branch-Specific Environment Variables
+      - name: Install GitHub CLI
         run: |
-          echo "Writing secrets for branch: $GITHUB_REF"
-          
-          # Loop through all available secrets and add them to the .env file
-          for secret in $(echo ${{ toJson(secrets) }} | jq -r 'keys[]'); do
-            echo "$secret=${{ secrets[$secret] }}" >> .env
-          done
+          sudo apt update
+          sudo apt install -y gh
+
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Set repo and environment
+        run: |
+          echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: List available secrets (names only)
+        run: |
+          echo "Fetching secrets from environment: $ENVIRONMENT"
+          gh api repos/$REPO/environments/$ENVIRONMENT/secrets --jq '.secrets[].name'
+
+      - name: Write hardcoded secrets to .env (example)
+        run: |
+          echo "Creating .env file"
+          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}"
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}"
+          cat .env
+
+      - name: Upload .env file
+        uses: actions/upload-artifact@v4
+        with:
+          name: env-file
+          path: .env
