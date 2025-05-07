@@ -2,6 +2,9 @@ name: Generate .env from Environment Secrets
 
 on: push
 
+permissions:
+  contents: write  # Allow push access to the repository
+
 jobs:
   generate-env:
     runs-on: ubuntu-latest
@@ -20,6 +23,8 @@ jobs:
           echo "REACT_APP_INDEXEDDB_DATABASE_VERSION=${{ secrets.REACT_APP_INDEXEDDB_DATABASE_VERSION }}" >> .env
           echo "REACT_APP__LOCAL_API_URL=${{ secrets.REACT_APP__LOCAL_API_URL }}" >> .env
 
+      - name: Set permissions for .env file
+        run: |
           chmod 600 .env  # Set secure file permissions on the .env file
 
       - name: Commit and push changes to .env
