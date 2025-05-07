@@ -6,3 +6,6 @@ jobs:
     steps:
       - name: my-step
         run: echo "Hello World!"
+
+      - name: Retrieve API_KEY secret
+        run: echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" > .env
