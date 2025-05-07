@@ -18,6 +18,7 @@ jobs:
         run: |
           echo "Writing secrets for branch: $GITHUB_REF"
           
-          # Overwrite .env file with branch-specific secrets
-          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" >> .env
-          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+          # Loop through all available secrets and add them to the .env file
+          for secret in $(echo ${{ toJson(secrets) }} | jq -r 'keys[]'); do
+            echo "$secret=${{ secrets[$secret] }}" >> .env
+          done
