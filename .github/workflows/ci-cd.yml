@@ -11,33 +11,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create .env and write REACT_APP_CRYPTO_SECRET_KEY
+      - name: Create .env and write secrets
         run: |
           echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" > .env
-        env:
-          REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
-
-      - name: Append REACT_APP_API_URL to .env
-        run: |
           echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
-        env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          echo "REACT_APP_INDEXEDDB_DATABASE_NAME=${{ secrets.REACT_APP_INDEXEDDB_DATABASE_NAME }}" >> .env
+          echo "REACT_APP_INDEXEDDB_DATABASE_STORENAME=${{ secrets.REACT_APP_INDEXEDDB_DATABASE_STORENAME }}" >> .env
+          echo "REACT_APP_INDEXEDDB_DATABASE_VERSION=${{ secrets.REACT_APP_INDEXEDDB_DATABASE_VERSION }}" >> .env
+          echo "REACT_APP__LOCAL_API_URL=${{ secrets.REACT_APP__LOCAL_API_URL }}" >> .env
 
-      - name: Verify .env file content and existence
+      - name: Set permissions for .env file
         run: |
-          echo "Verifying .env file..."
-          ls -la
-          if [ -f .env ]; then
-            echo ".env file found!"
-            echo "Contents of .env:"
-            cat .env
-          else
-            echo "ERROR: .env file not found!"
-            exit 1
-          fi
+          chmod 600 .env  # Set secure file permissions on the .env file
 
-      - name: Upload .env file as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: env-file
-          path: .env
+      - name: Verify .env file
+        run: |
+          cat .env  # Show content of .env for debugging purposes
