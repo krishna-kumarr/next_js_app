@@ -20,9 +20,15 @@ jobs:
           echo "REACT_APP_INDEXEDDB_DATABASE_VERSION=${{ secrets.REACT_APP_INDEXEDDB_DATABASE_VERSION }}" >> .env
           echo "REACT_APP__LOCAL_API_URL=${{ secrets.REACT_APP__LOCAL_API_URL }}" >> .env
 
-      - name: Set permissions for .env file
-        run: |
           chmod 600 .env  # Set secure file permissions on the .env file
+
+      - name: Commit and push changes to .env
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .env
+          git commit -m "Update .env file with branch-specific secrets"
+          git push
 
       - name: Verify .env file
         run: |
