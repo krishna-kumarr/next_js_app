@@ -5,7 +5,7 @@ on: push
 jobs:
   sample-job:
     runs-on: ubuntu-latest
-    environment: main 
+    environment: ${{ github.ref_name }}  # Dynamically set the environment based on the branch name
 
     steps:
       - name: Checkout repository
@@ -14,13 +14,32 @@ jobs:
       - name: Say Hello
         run: echo "Hello World!"
 
-      - name: Write secret to .env
-        run: echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" > .env
+      - name: Dynamically Set Branch-Specific Environment Variables
+        run: |
+          echo "Writing secrets for branch: $GITHUB_REF"
+          
+          # Create or overwrite .env file with branch-specific secrets
+          echo "REACT_APP_CRYPTO_SECRET_KEY=${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}" > .env
+          
+          # Dynamically add other secrets based on branch, if needed
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+          
+          # Debug: Show the content of .env file
+          cat .env
+          
         env:
           REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
-      - name: View .env file (for testing only)
-        run: cat .env
+      - name: Ensure .env file exists
+        run: |
+          if [ -f .env ]; then
+            echo ".env file found!"
+            cat .env  # Print content for debugging
+          else
+            echo ".env file does not exist!"
+            exit 1
+          fi
 
       - name: Upload .env file as artifact
         uses: actions/upload-artifact@v4
