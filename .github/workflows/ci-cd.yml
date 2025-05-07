@@ -5,7 +5,7 @@ on: push
 jobs:
   generate-env:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Must match an environment name in GitHub
+    environment: ${{ github.ref_name }}  # Must match an existing environment name (e.g., 'main', 'prod', etc.)
 
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Set repo and environment
+      - name: Set repo and environment variables
         run: |
           echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
           echo "ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
@@ -37,12 +37,22 @@ jobs:
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
-      - name: Final step - verify .env file
+      - name: Securely verify .env keys
         run: |
-          echo ".env content:"
-          cat .env
+          echo "✅ Verifying .env keys:"
+          awk -F '=' '{ print "- " $1 }' .env
 
-      - name: Upload .env file
+      - name: Check that secret values are not empty
+        run: |
+          source .env
+          if [ -z "$REACT_APP_CRYPTO_SECRET_KEY" ] || [ -z "$REACT_APP_API_URL" ]; then
+            echo "❌ One or more secrets are empty!"
+            exit 1
+          else
+            echo "✅ All secrets are present and non-empty."
+          fi
+
+      - name: Upload .env file as artifact
         uses: actions/upload-artifact@v4
         with:
           name: env-file
