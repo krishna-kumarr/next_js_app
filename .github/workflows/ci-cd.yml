@@ -15,7 +15,7 @@ jobs:
         run: echo "Hello World!"
 
       - name: Write secret to .env
-        run: echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" >> .env
+        run: echo "REACT_APP_CRYPTO_SECRET_KEY=$REACT_APP_CRYPTO_SECRET_KEY" > .env
         env:
           REACT_APP_CRYPTO_SECRET_KEY: ${{ secrets.REACT_APP_CRYPTO_SECRET_KEY }}
 
